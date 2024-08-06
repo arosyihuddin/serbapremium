@@ -1,3 +1,5 @@
+import path from "path";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -6,12 +8,12 @@ const nextConfig = {
       test: /\.svg$/,
       use: [
         {
-          loader: '@svgr/webpack',
+          loader: "@svgr/webpack",
           options: {
             svgoConfig: {
               plugins: [
                 {
-                  name: 'removeViewBox',
+                  name: "removeViewBox",
                   active: false,
                 },
               ],
@@ -19,9 +21,19 @@ const nextConfig = {
           },
         },
       ],
-    })
-    return config
-  },
-}
+    });
 
-export default nextConfig
+    // Tambahkan alias resolusi
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      components: path.resolve("components"),
+      data: path.resolve("data"),
+      hooks: path.resolve("hooks"),
+      styles: path.resolve("styles"),
+    };
+
+    return config;
+  },
+};
+
+export default nextConfig;

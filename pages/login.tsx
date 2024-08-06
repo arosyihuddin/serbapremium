@@ -63,7 +63,7 @@ const Login: NextPage = () => {
           isClosable: true,
           position: 'top-right',
         });
-        // window.location.href = '/dashboard';
+        window.location.href = '/dashboard';
       } else {
         setEmailNotVerified(true);
       }

@@ -36,13 +36,13 @@ import { Testimonial, Testimonials } from "components/testimonials";
 import faq from "data/faq";
 import testimonials from "data/testimonials";
 import pricing from "data/pricing";
+import { plasticEffectStyle } from "styles/serviceStyles";
 
 import {
   Highlights,
   HighlightsItem,
 } from "components/highlights";
 import iconMap from "data/service";
-import { plasticEffectStyle } from "styles/serviceStyles";
 
 const Home: NextPage = () => {
   return (
