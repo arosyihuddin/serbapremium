@@ -5,6 +5,7 @@ import { auth } from "../utils/firebaseClient";
 import { Center, Spinner, Box, Text, Flex } from "@chakra-ui/react";
 import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import { NextPage } from 'next';
+import { getCookie } from 'cookies-next';
 
 const Verify: NextPage = () => {
   const router = useRouter();
@@ -31,6 +32,14 @@ const Verify: NextPage = () => {
       verifyEmail(oobCode as string);
     }
   }, [oobCode, router]);
+
+  useEffect(() => {
+    // Cek apakah pengguna sudah login
+    const token = getCookie('serbapremiumId'); // Atau sesuai dengan nama cookie token Anda
+    if (token) {
+      router.push("/dashboard"); // Arahkan ke halaman dashboard jika sudah login
+    }
+  }, [router]);
 
   return (
     <Center height="100vh">
@@ -61,6 +70,5 @@ const Verify: NextPage = () => {
     </Center>
   );
 };
-
 
 export default Verify;

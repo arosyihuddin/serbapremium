@@ -1,3 +1,4 @@
+// pages/login.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Center,
@@ -21,12 +22,12 @@ import { PageTransition } from 'components/motion/page-transition';
 import { Section } from 'components/section';
 import { NextPage } from 'next';
 import dynamic from 'next/dynamic';
+const DynamicLink = dynamic(() => import('@saas-ui/react').then(mod => mod.Link), { ssr: false });
 import { signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth } from '../utils/firebaseClient';
+import { setCookie } from 'cookies-next';
 import NextLink from 'next/link';
-import { useAuth } from '@saas-ui/auth'; // Pastikan mengimpor useAuth
-
-const DynamicLink = dynamic(() => import('@saas-ui/react').then(mod => mod.Link), { ssr: false });
+import { useAuth } from '@saas-ui/auth';
 
 const Login: NextPage = () => {
   const [email, setEmail] = useState<string>('');
@@ -37,7 +38,7 @@ const Login: NextPage = () => {
   const [isRequestingVerification, setIsRequestingVerification] = useState<boolean>(false);
   const toast = useToast();
   const emailRef = useRef<HTMLInputElement>(null);
-  const { logIn } = useAuth(); // Menggunakan logIn dari useAuth
+  const { logIn } = useAuth();
 
   useEffect(() => {
     if (emailRef.current) {
@@ -48,13 +49,18 @@ const Login: NextPage = () => {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      console.log("Firebase login successful, user:", user);
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-      if (user.emailVerified) {
-        await logIn({ email, password }); // Memanggil logIn dari useAuth setelah login berhasil
-        console.log("logIn successful");
+      const data = await response.json();
+
+      if (response.ok) {
+        await logIn({ email, password });
         toast({
           title: 'Login successful',
           description: 'You have been logged in successfully.',
@@ -65,22 +71,21 @@ const Login: NextPage = () => {
         });
         window.location.href = '/dashboard';
       } else {
-        setEmailNotVerified(true);
+        setEmailNotVerified(data.message === 'Email not verified');
+        toast({
+          title: 'Login failed',
+          description: data.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top-right',
+        });
       }
-    } catch (error: any) {
-      let errorMessage = 'An unexpected error occurred.';
-      if (error.code === 'auth/invalid-email') {
-        errorMessage = 'The email address is not valid.';
-      } else if (error.code === 'auth/invalid-credential') {
-        errorMessage = 'Incorrect email or password.';
-      } else if (error.code === 'auth/missing-password') {
-        errorMessage = 'Password is required.';
-      }
-
+    } catch (error) {
       console.error('Error during login:', error);
       toast({
         title: 'Login failed',
-        description: errorMessage,
+        description: 'An unexpected error occurred.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -103,6 +108,7 @@ const Login: NextPage = () => {
           status: "success",
           duration: 3000,
           isClosable: true,
+          position: 'top-right',
         });
         setEmailNotVerified(false);
       } else {
@@ -123,6 +129,7 @@ const Login: NextPage = () => {
         status: "error",
         duration: 3000,
         isClosable: true,
+        position: 'top-right',
       });
     } finally {
       setIsRequestingVerification(false);
@@ -143,7 +150,7 @@ const Login: NextPage = () => {
                 ) : (
                   <Stack spacing={2} align="center">
                     <Box fontSize="2xl" color="teal.500">
-                      <FiMail size="58px" /> {/* Menambahkan ukuran pada ikon */}
+                      <FiMail size="58px" />
                     </Box>
                     <Button
                       colorScheme="teal"

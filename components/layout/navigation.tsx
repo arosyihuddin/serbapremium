@@ -1,26 +1,96 @@
+// import * as React from "react";
+// import { HStack } from "@chakra-ui/react";
+
+// import { useRouter } from "next/router";
+
+// import siteConfig from "data/config";
+
+// import { NavLink } from "components/nav-link";
+
+// import { useScrollSpy } from "hooks/use-scrollspy";
+
+// import { MobileNavButton } from "components/mobile-nav";
+// import { MobileNavContent } from "components/mobile-nav";
+// import { useDisclosure, useUpdateEffect } from "@chakra-ui/react";
+// import { useAuth } from "@saas-ui/auth";
+
+// import ThemeToggle from "./theme-toggle";
+
+// const Navigation: React.FC = () => {
+//   // const { isAuthenticated, user, logOut } = useAuth();
+//   // console.log("User Info", user);
+//   // console.log("logOut", logOut);
+//   // console.log("isAuthenticate", isAuthenticated);
+//   const mobileNav = useDisclosure();
+//   const router = useRouter();
+//   const activeId = useScrollSpy(
+//     siteConfig.header.links
+//       .filter(({ id }) => id)
+//       .map(({ id }) => `[id="${id}"]`),
+//     {
+//       threshold: 0.75,
+//     }
+//   );
+
+//   const mobileNavBtnRef = React.useRef<HTMLButtonElement>();
+
+//   useUpdateEffect(() => {
+//     mobileNavBtnRef.current?.focus();
+//   }, [mobileNav.isOpen]);
+
+//   return (
+//     <HStack spacing="2" flexShrink={0}>
+//       {siteConfig.header.links.map(({ href, id, ...props }, i) => {
+//         return (
+//           <NavLink
+//             display={["none", null, "block"]}
+//             href={href || `/#${id}`}
+//             key={i}
+//             isActive={
+//               !!(
+//                 (id && activeId === id) ||
+//                 (href && !!router.asPath.match(new RegExp(href)))
+//               )
+//             }
+//             {...props}
+//           >
+//             {props.label}
+//           </NavLink>
+//         );
+//       })}
+
+//       <ThemeToggle />
+
+//       <MobileNavButton
+//         ref={mobileNavBtnRef}
+//         aria-label="Open Menu"
+//         onClick={mobileNav.onOpen}
+//       />
+
+//       <MobileNavContent isOpen={mobileNav.isOpen} onClose={mobileNav.onClose} />
+//     </HStack>
+//   );
+// };
+
+// export default Navigation;
+
+
+// Batas Original Code 
+
 import * as React from "react";
-import { HStack } from "@chakra-ui/react";
-
+import { HStack, Button } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-
 import siteConfig from "data/config";
-
 import { NavLink } from "components/nav-link";
-
 import { useScrollSpy } from "hooks/use-scrollspy";
-
 import { MobileNavButton } from "components/mobile-nav";
 import { MobileNavContent } from "components/mobile-nav";
 import { useDisclosure, useUpdateEffect } from "@chakra-ui/react";
-import { useAuth } from "@saas-ui/auth";
-
 import ThemeToggle from "./theme-toggle";
+import Cookies from "js-cookie";
 
 const Navigation: React.FC = () => {
-  const { isAuthenticated, user, logOut } = useAuth();
-  console.log("User Info", user);
-  console.log("logOut", logOut);
-  console.log("isAuthenticate", isAuthenticated);
+  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
   const mobileNav = useDisclosure();
   const router = useRouter();
   const activeId = useScrollSpy(
@@ -32,31 +102,60 @@ const Navigation: React.FC = () => {
     }
   );
 
-  const mobileNavBtnRef = React.useRef<HTMLButtonElement>();
+  const mobileNavBtnRef = React.useRef<HTMLButtonElement>(null);
 
   useUpdateEffect(() => {
     mobileNavBtnRef.current?.focus();
   }, [mobileNav.isOpen]);
 
+  // Update auth status from cookie
+  React.useEffect(() => {
+    const token = Cookies.get('serbapremiumId');
+    setIsAuthenticated(!!token);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      Cookies.remove('serbapremiumId'); // Hapus token dari cookie
+      setIsAuthenticated(false); // Perbarui status autentikasi
+      router.push('/'); // Arahkan ke halaman beranda setelah logout
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   return (
     <HStack spacing="2" flexShrink={0}>
-      {siteConfig.header.links.map(({ href, id, ...props }, i) => {
-        return (
-          <NavLink
-            display={["none", null, "block"]}
-            href={href || `/#${id}`}
-            key={i}
-            isActive={
-              !!(
-                (id && activeId === id) ||
-                (href && !!router.asPath.match(new RegExp(href)))
-              )
-            }
-            {...props}
-          >
-            {props.label}
-          </NavLink>
-        );
+      {siteConfig.header.links.map(({ href, id, label, requiresAuth, ...props }, i) => {
+        if (requiresAuth === undefined || requiresAuth === isAuthenticated) {
+          if (label === 'Logout') {
+            return (
+              <Button
+                key={i}
+                onClick={handleLogout}
+                variant="primary"
+              >
+                Logout
+              </Button>
+            );
+          }
+            return (
+            <NavLink
+              key={i}
+              display={["none", null, "block"]}
+              href={href || `/#${id}`}
+              isActive={
+                !!(
+                  (id && activeId === id) ||
+                  (href && !!router.asPath.match(new RegExp(href)))
+                )
+              }
+              {...props}
+            >
+              {label}
+            </NavLink>
+            );
+        }
       })}
 
       <ThemeToggle />
@@ -73,96 +172,3 @@ const Navigation: React.FC = () => {
 };
 
 export default Navigation;
-
-
-// Batas Original Code 
-
-
-// import * as React from "react";
-// import { HStack, Button } from "@chakra-ui/react";
-// import { useRouter } from "next/router";
-// import { useAuth } from "@saas-ui/auth"; // Atau gunakan Firebase auth
-// import siteConfig from "data/config";
-// import { NavLink } from "components/nav-link";
-// import { useScrollSpy } from "hooks/use-scrollspy";
-// import { MobileNavButton } from "components/mobile-nav";
-// import { MobileNavContent } from "components/mobile-nav";
-// import { useDisclosure, useUpdateEffect } from "@chakra-ui/react";
-// import ThemeToggle from "./theme-toggle";
-
-// const Navigation: React.FC = () => {
-//   const { user, signOut } = useAuth(); // Atau gunakan Firebase auth
-//   const mobileNav = useDisclosure();
-//   const router = useRouter();
-//   const activeId = useScrollSpy(
-//     siteConfig.header.links
-//       .filter(({ id }) => id)
-//       .map(({ id }) => `[id="${id}"]`),
-//     {
-//       threshold: 0.75,
-//     }
-//   );
-
-//   const mobileNavBtnRef = React.useRef<HTMLButtonElement>(null);
-
-//   useUpdateEffect(() => {
-//     mobileNavBtnRef.current?.focus();
-//   }, [mobileNav.isOpen]);
-
-//   const handleLogout = async () => {
-//     try {
-//       await signOut(); // Menggunakan Firebase auth: await auth.signOut();
-//       router.push('/'); // Arahkan ke halaman beranda setelah logout
-//     } catch (error) {
-//       console.error("Logout error:", error);
-//     }
-//   };
-
-//   return (
-//     <HStack spacing="2" flexShrink={0}>
-//       {siteConfig.header.links.map(({ href, id, requiresAuth, ...props }, i) => {
-//         // Hanya tampilkan link jika `requiresAuth` sesuai dengan status autentikasi
-//         if (requiresAuth === undefined || (requiresAuth && user) || (!requiresAuth && !user)) {
-//           return (
-//             <NavLink
-//               display={["none", null, "block"]}
-//               href={href || `/#${id}`}
-//               key={i}
-//               isActive={
-//                 !!(
-//                   (id && activeId === id) ||
-//                   (href && !!router.asPath.match(new RegExp(href)))
-//                 )
-//               }
-//               {...props}
-//             >
-//               {props.children}
-//             </NavLink>
-//           );
-//         }
-//         return null; // Jangan tampilkan link jika tidak memenuhi kondisi
-//       })}
-
-//       <ThemeToggle />
-
-//       {user ? (
-//         <>
-//           <Button onClick={() => router.push('/dashboard')}>Dashboard</Button>
-//           <Button onClick={handleLogout}>Logout</Button>
-//         </>
-//       ) : (
-//         <Button onClick={() => router.push('/login')}>Login</Button>
-//       )}
-
-//       <MobileNavButton
-//         ref={mobileNavBtnRef}
-//         aria-label="Open Menu"
-//         onClick={mobileNav.onOpen}
-//       />
-
-//       <MobileNavContent isOpen={mobileNav.isOpen} onClose={mobileNav.onClose} />
-//     </HStack>
-//   );
-// };
-
-// export default Navigation;

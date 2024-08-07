@@ -31,21 +31,34 @@ const SignUp: NextPage = () => {
   const [password, setPassword] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false); // Tambahkan state loading
+  const [loading, setLoading] = useState<boolean>(false);
   const toast = useToast();
 
   // Referensi untuk field email
-  const emailRef = useRef<HTMLInputElement>(null);
+  const fieldRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     // Fokuskan field email saat halaman dimuat
-    if (emailRef.current) {
-      emailRef.current.focus();
+    if (fieldRef.current) {
+      fieldRef.current.focus();
     }
   }, []);
 
   const handleSignUp = async () => {
-    setLoading(true); // Tampilkan spinner saat sign up dimulai
+    if (!name.trim()) {
+      // Validasi nama tidak boleh kosong
+      toast({
+        title: 'Sign Up failed',
+        description: 'Name is required.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right'
+      });
+      return;
+    }
+
+    setLoading(true);
     try {
       // Daftarkan pengguna baru
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -69,10 +82,8 @@ const SignUp: NextPage = () => {
         status: 'success',
         duration: 3000,
         isClosable: true,
-        position: 'top-right' // Menampilkan toast di bagian atas
+        position: 'top-right'
       });
-
-      console.log(user);
 
       // Redirect ke halaman login
       window.location.href = '/login';
@@ -96,17 +107,17 @@ const SignUp: NextPage = () => {
         status: 'error',
         duration: 3000,
         isClosable: true,
-        position: 'top-right' // Menampilkan toast di bagian atas
+        position: 'top-right'
       });
     } finally {
-      setLoading(false); // Hentikan spinner setelah sign up selesai
+      setLoading(false);
     }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
-      event.preventDefault(); // Mencegah form submit default jika ada
-      handleSignUp(); // Panggil fungsi sign up
+      event.preventDefault();
+      handleSignUp();
     }
   };
 
@@ -120,11 +131,12 @@ const SignUp: NextPage = () => {
             <FormControl id="name">
               <FormLabel>Name</FormLabel>
               <Input
-                ref={emailRef} // Setel referensi untuk fokus otomatis
+                ref={fieldRef}
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                onKeyDown={handleKeyDown} // Tambahkan event handler untuk keydown
+                onKeyDown={handleKeyDown}
+                placeholder="Enter your name" // Placeholder untuk field nama
               />
             </FormControl>
             <FormControl id="email">
@@ -133,7 +145,8 @@ const SignUp: NextPage = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={handleKeyDown} // Tambahkan event handler untuk keydown
+                onKeyDown={handleKeyDown}
+                placeholder="Enter your email" // Placeholder untuk field email
               />
             </FormControl>
             <FormControl id="password">
@@ -143,7 +156,8 @@ const SignUp: NextPage = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={handleKeyDown} // Tambahkan event handler untuk keydown
+                  onKeyDown={handleKeyDown}
+                  placeholder="Enter your password" // Placeholder untuk field password
                 />
                 <InputRightElement width="2.0rem" mr="0.2rem">
                   <Box
@@ -172,7 +186,7 @@ const SignUp: NextPage = () => {
             </Text>
             <Flex direction="column" align="center" justify="center">
               {loading ? (
-                <Spinner size="lg" color="teal.500" /> // Spinner untuk animasi loading
+                <Spinner size="lg" color="teal.500" />
               ) : (
                 <Button colorScheme="teal" onClick={handleSignUp}>
                   Sign Up

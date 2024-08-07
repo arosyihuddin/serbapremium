@@ -1,5 +1,5 @@
 {
-  "name": "saas-ui-nextjs-landing-page",
+  "name": "serba-premium",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -18,8 +18,11 @@
     "@fontsource/inter": "^4.5.15",
     "@saas-ui/auth": "^3.0.6",
     "@saas-ui/react": "^2.7.2",
+    "cookies-next": "^4.2.1",
     "firebase": "^10.12.5",
+    "firebase-admin": "^12.3.0",
     "framer-motion": "^10.18.0",
+    "js-cookie": "^3.0.5",
     "next": "^14.2.5",
     "next-seo": "^6.5.0",
     "react": "18.2.0",

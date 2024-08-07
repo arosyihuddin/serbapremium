@@ -30,11 +30,24 @@ const siteConfig = {
       {
         label: 'Login',
         href: '/login',
+        requiresAuth: false,
       },
       {
         label: 'Sign Up',
         href: '/signup',
         variant: 'primary',
+        requiresAuth: false,
+      },
+      {
+        label: 'Dashboard',
+        href: '/dashboard',
+        requiresAuth: true,
+      },
+      {
+        label: 'Logout',
+        href: '#',
+        variant: 'primary',
+        requiresAuth: true,
       },
     ],
   },
