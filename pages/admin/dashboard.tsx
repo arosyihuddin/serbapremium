@@ -1,15 +1,12 @@
-import * as React from "react";
-import type { NextPage } from "next";
-import { BackgroundGradient } from "components/gradients/background-gradient";
 import { Section } from 'components/section';
+import { BackgroundGradient } from 'components/gradients/background-gradient';
 
-const Dashboard: NextPage = () => {
+const Dashboard = () => {
+  return (
+    <Section height="calc(100vh - 200px)" innerWidth="container.sm">
+      <BackgroundGradient height="100%" zIndex="-1" />
+    </Section>
     
-    return (
-        <Section height="72vh" innerWidth="container.xl">
-            <BackgroundGradient zIndex="-1" />
-
-      </Section>
   );
 };
 

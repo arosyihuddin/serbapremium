@@ -14,18 +14,15 @@ import {
   Text,
   Heading,
   Spinner,
-  Flex
+  Flex,
 } from '@chakra-ui/react';
-import { FiEyeOff, FiEye, FiMail } from 'react-icons/fi';
+import { FiEyeOff, FiEye } from 'react-icons/fi';
 import { BackgroundGradient } from 'components/gradients/background-gradient';
 import { PageTransition } from 'components/motion/page-transition';
 import { Section } from 'components/section';
 import { NextPage } from 'next';
 import dynamic from 'next/dynamic';
 const DynamicLink = dynamic(() => import('@saas-ui/react').then(mod => mod.Link), { ssr: false });
-import { signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import { auth } from '../utils/firebaseClient';
-import { setCookie } from 'cookies-next';
 import NextLink from 'next/link';
 import { useAuth } from '@saas-ui/auth';
 
@@ -34,11 +31,8 @@ const Login: NextPage = () => {
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [emailNotVerified, setEmailNotVerified] = useState<boolean>(false);
-  const [isRequestingVerification, setIsRequestingVerification] = useState<boolean>(false);
   const toast = useToast();
   const emailRef = useRef<HTMLInputElement>(null);
-  const { logIn } = useAuth();
 
   useEffect(() => {
     if (emailRef.current) {
@@ -60,7 +54,6 @@ const Login: NextPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        await logIn({ email, password });
         toast({
           title: 'Login successful',
           description: 'You have been logged in successfully.',
@@ -70,8 +63,7 @@ const Login: NextPage = () => {
           position: 'top-right',
         });
         window.location.href = '/dashboard';
-      } else {
-        setEmailNotVerified(data.message === 'Email not verified');
+      } else if (response.status === 401) {
         toast({
           title: 'Login failed',
           description: data.message,
@@ -81,9 +73,17 @@ const Login: NextPage = () => {
           position: 'top-right',
         });
         window.location.href = '/verify-email';
+      } else {
+        toast({
+          title: 'Login failed',
+          description: data.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top-right',
+        });
       }
     } catch (error) {
-      
       console.error('Error during login:', error);
       toast({
         title: 'Login failed',
