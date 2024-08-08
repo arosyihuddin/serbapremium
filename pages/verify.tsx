@@ -1,25 +1,38 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { applyActionCode } from "firebase/auth";
-import { auth } from "../utils/firebaseClient";
+import { applyActionCode, getAuth } from "firebase/auth";
+import { auth } from "../utils/firebaseClient"; // Pastikan ini mengimpor instance auth yang benar
 import { Center, Spinner, Box, Text, Flex } from "@chakra-ui/react";
 import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import { NextPage } from 'next';
-import { getCookie } from 'cookies-next';
+import Cookies from "js-cookie";
 
 const Verify: NextPage = () => {
   const router = useRouter();
   const { oobCode } = router.query;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isVerified, setIsVerified] = useState<boolean>(false);
+  
 
   useEffect(() => {
     const verifyEmail = async (oobCode: string) => {
       try {
         // Lakukan verifikasi email
         await applyActionCode(auth, oobCode);
-        setIsVerified(true); // Tandai sebagai berhasil
-        router.push("/dashboard"); // Arahkan ke halaman dashboard
+
+        // Login otomatis
+        const authInstance = getAuth(); // Pastikan untuk mendapatkan instance auth dari Firebase
+        const user = authInstance.currentUser;
+        
+        if (user) {
+          // Ambil token
+          const token = await user.getIdToken();
+          Cookies.set('serbapremiumId', token); // Set token ke cookie
+          router.push("/dashboard"); // Arahkan ke halaman dashboard
+        } else {
+          // Jika user belum login, mungkin perlu melakukan login manual
+          setIsVerified(false);
+        }
       } catch (error) {
         console.error("Error verifying email: ", error);
         setIsVerified(false); // Tandai sebagai gagal
@@ -32,14 +45,6 @@ const Verify: NextPage = () => {
       verifyEmail(oobCode as string);
     }
   }, [oobCode, router]);
-
-  useEffect(() => {
-    // Cek apakah pengguna sudah login
-    const token = getCookie('serbapremiumId'); // Atau sesuai dengan nama cookie token Anda
-    if (token) {
-      router.push("/dashboard"); // Arahkan ke halaman dashboard jika sudah login
-    }
-  }, [router]);
 
   return (
     <Center height="100vh">

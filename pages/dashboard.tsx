@@ -1,4 +1,3 @@
-// pages/dashboard.tsx
 import React from 'react';
 import { NextPage } from 'next';
 import {
@@ -8,11 +7,10 @@ import {
   Heading,
   Text,
   Link,
-  Divider,
   VStack,
   HStack,
   Icon,
-  Button,
+  useBreakpointValue,
 } from '@chakra-ui/react';
 import { FiChevronRight, FiEdit, FiActivity, FiFileText, FiDownload, FiPlay, FiAlertTriangle } from 'react-icons/fi';
 import { BiDiamond } from "react-icons/bi";
@@ -22,11 +20,14 @@ import { SEO } from 'components/seo/seo';
 import Image from 'next/image';
 
 const Dashboard: NextPage = () => {
+  // Define padding values for mobile and desktop
+  const paddingTop = useBreakpointValue({ base: '60px', md: '80px' });
+
   return (
     <Box>
       <SEO title="Dashboard" description="User dashboard" />
       <BackgroundGradient height="100%" zIndex="-1" />
-      <Container maxW="container.lg" pt={{ base: 10, md: 20 }} pb={{ base: 10, md: 20 }}>
+      <Container maxW="container.lg" pt={paddingTop} pb={{ base: 10, md: 20 }}>
         <PageTransition>
           <Stack spacing={6}>
             {/* Header Section */}
@@ -67,7 +68,7 @@ const Dashboard: NextPage = () => {
             <Box>
               <Heading size="md" mb={4}>Premium</Heading>
               <VStack spacing={4} align="start">
-                <Link href="/price" display="flex" _hover={{ textDecor: 'none' }}>
+                <Link href="/#pricing" display="flex" _hover={{ textDecor: 'none' }}>
                   <Icon as={BiDiamond} mr={2} />
                   <Text>Purchase premium</Text>
                   <Icon as={FiChevronRight} ml="auto" />

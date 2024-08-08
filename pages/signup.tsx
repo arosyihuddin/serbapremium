@@ -77,7 +77,7 @@ const SignUp: NextPage = () => {
       });
 
       toast({
-        title: 'SignUp successful',
+        title: 'Sign Up successful',
         description: 'You have been signed up successfully. Please check your email to verify your account.',
         status: 'success',
         duration: 3000,
@@ -85,8 +85,8 @@ const SignUp: NextPage = () => {
         position: 'top-right'
       });
 
-      // Redirect ke halaman login
-      window.location.href = '/login';
+      // Redirect ke halaman verifikasi email
+      window.location.href = '/verify-email';
     } catch (error: any) {
       console.error('Error during sign up:', error);
 
@@ -136,7 +136,7 @@ const SignUp: NextPage = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Enter your name" // Placeholder untuk field nama
+                placeholder="Enter your name"
               />
             </FormControl>
             <FormControl id="email">
@@ -146,7 +146,7 @@ const SignUp: NextPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Enter your email" // Placeholder untuk field email
+                placeholder="Enter your email"
               />
             </FormControl>
             <FormControl id="password">
@@ -157,7 +157,7 @@ const SignUp: NextPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Enter your password" // Placeholder untuk field password
+                  placeholder="Enter your password"
                 />
                 <InputRightElement width="2.0rem" mr="0.2rem">
                   <Box
